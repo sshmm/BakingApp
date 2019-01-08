@@ -1,26 +1,41 @@
 package com.example.android.bakingapp.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.PrimaryKey;
+
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "steps", foreignKeys = @ForeignKey(entity = Recipe.class,
+        parentColumns = "id",
+        childColumns = "recipeId",
+        onDelete = CASCADE))
 public class Step {
-    private int id;
+    @PrimaryKey(autoGenerate = false)
+    private int stepId;
     private String shortDescription;
     private String description;
     private String videoURL;
     private String thumbnailURL;
+    private int recipeId;
 
-    public Step(int id, String shortDescription, String description, String videoURL, String thumbnailURL) {
+    public Step(int stepId, String shortDescription, String description,
+                String videoURL, String thumbnailURL, int recipeId) {
         this.description = description;
-        this.id = id;
+        this.stepId = stepId;
         this.shortDescription = shortDescription;
         this.thumbnailURL = thumbnailURL;
         this.videoURL = videoURL;
+        this.recipeId = recipeId;
+
     }
 
-    public int getId() {
-        return id;
+    public int getStepId() {
+        return stepId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStepId(int stepId) {
+        this.stepId = stepId;
     }
 
     public String getShortDescription() {
@@ -53,5 +68,13 @@ public class Step {
 
     public void setThumbnailURL(String thumbnailURL) {
         this.thumbnailURL = thumbnailURL;
+    }
+
+    public int getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(int recipeId) {
+        this.recipeId = recipeId;
     }
 }

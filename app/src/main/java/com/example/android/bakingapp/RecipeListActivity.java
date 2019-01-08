@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.android.bakingapp.adapters.RecipesAdapter;
 import com.example.android.bakingapp.dummy.DummyContent;
+import com.example.android.bakingapp.model.Ingredient;
 import com.example.android.bakingapp.model.Recipe;
 import com.example.android.bakingapp.model.Step;
 
@@ -108,6 +109,7 @@ public class RecipeListActivity extends AppCompatActivity {
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
                     arguments.putString(RecipeDetailFragment.ARG_ITEM_ID, item.id);
+
                     RecipeDetailFragment fragment = new RecipeDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -116,7 +118,7 @@ public class RecipeListActivity extends AppCompatActivity {
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, RecipeDetailActivity.class);
-                    intent.putExtra(RecipeDetailFragment.ARG_ITEM_ID, item.id);
+                    //  intent.putExtra(RecipeDetailFragment.ARG_ITEM_ID, item.id);
 
                     context.startActivity(intent);
                 }
@@ -141,15 +143,23 @@ public class RecipeListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             List<Step> recipeSteps = mValues.getSteps();
-            holder.mContentView.setText(recipeSteps.get(position).getShortDescription());
+            List<Ingredient> ingredientList = mValues.getIngredients();
+            if (position > 0) {
+                position = position - 1;
+                holder.mContentView.setText(recipeSteps.get(position).getShortDescription());
 
-            holder.itemView.setTag(recipeSteps.get(position).getShortDescription());
+                holder.itemView.setTag(recipeSteps.get(position));
+            } else {
+                holder.mContentView.setText("Ingredients List");
+
+                holder.itemView.setTag("ingredient");
+            }
             holder.itemView.setOnClickListener(mOnClickListener);
         }
 
         @Override
         public int getItemCount() {
-            return mValues.getSteps().size();
+            return (mValues.getSteps().size() + 1);
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {

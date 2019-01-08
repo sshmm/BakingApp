@@ -48,10 +48,10 @@ public class JsonUtils {
                     String name = jRecipe.getString("name");
 
                     JSONArray ingredientsArray = jRecipe.getJSONArray("ingredients");
-                    List<Ingredient> ingredients = parseIngredientList(ingredientsArray);
+                    List<Ingredient> ingredients = parseIngredientList(id, ingredientsArray);
 
                     JSONArray stepsArray = jRecipe.getJSONArray("steps");
-                    List<Step> steps = parseStepList(stepsArray);
+                    List<Step> steps = parseStepList(id, stepsArray);
 
                     int servings = jRecipe.getInt("servings");
                     String imageUrl = jRecipe.getString("image");
@@ -70,8 +70,9 @@ public class JsonUtils {
 
     }
 
-    private static List<Ingredient> parseIngredientList(JSONArray ingredients) {
+    private static List<Ingredient> parseIngredientList(int recipeId, JSONArray ingredients) {
         List<Ingredient> ingredientsList = new ArrayList<>();
+        int i = 0;
         if (ingredients != null) {
             List<String> ingredientsString = getListJson(ingredients.toString());
             try {
@@ -80,7 +81,8 @@ public class JsonUtils {
                     int quantity = jIngredient.getInt("quantity");
                     String measure = jIngredient.getString("measure");
                     String ingredient = jIngredient.getString("ingredient");
-                    ingredientsList.add(new Ingredient(quantity, measure, ingredient));
+                    ingredientsList.add(new Ingredient(i, quantity, measure, ingredient, recipeId));
+                    i++;
                 }
                 return ingredientsList;
             } catch (JSONException e) {
@@ -93,7 +95,7 @@ public class JsonUtils {
     }
 
 
-    private static List<Step> parseStepList(JSONArray steps) {
+    private static List<Step> parseStepList(int recipeId, JSONArray steps) {
         List<Step> stepsList = new ArrayList<>();
         if (steps != null) {
             List<String> stepsString = getListJson(steps.toString());
@@ -105,7 +107,7 @@ public class JsonUtils {
                     String description = jStep.getString("description");
                     String videoURL = jStep.getString("videoURL");
                     String thumbnailURL = jStep.getString("thumbnailURL");
-                    stepsList.add(new Step(id, shortDescription, description, videoURL, thumbnailURL));
+                    stepsList.add(new Step(id, shortDescription, description, videoURL, thumbnailURL, recipeId));
                 }
                 return stepsList;
             } catch (JSONException e) {

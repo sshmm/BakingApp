@@ -1,8 +1,13 @@
 package com.example.android.bakingapp.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import java.util.List;
 
+@Entity(tableName = "recipes")
 public class Recipe {
+    @PrimaryKey(autoGenerate = false)
     private int id;
     private String name;
     private List<Ingredient> ingredients;
