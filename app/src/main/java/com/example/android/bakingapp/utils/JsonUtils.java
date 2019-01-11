@@ -1,8 +1,8 @@
 package com.example.android.bakingapp.utils;
 
-import com.example.android.bakingapp.model.Ingredient;
-import com.example.android.bakingapp.model.Recipe;
-import com.example.android.bakingapp.model.Step;
+import com.example.android.bakingapp.entities.Ingredient;
+import com.example.android.bakingapp.entities.Recipe;
+import com.example.android.bakingapp.entities.Step;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +56,7 @@ public class JsonUtils {
                     int servings = jRecipe.getInt("servings");
                     String imageUrl = jRecipe.getString("image");
 
-                    recipeList.add(new Recipe(id, name, ingredients, steps, servings, imageUrl));
+                    recipeList.add(new Recipe(id, name, servings, imageUrl));
                 }
                 return recipeList;
 
@@ -70,7 +70,7 @@ public class JsonUtils {
 
     }
 
-    private static List<Ingredient> parseIngredientList(int recipeId, JSONArray ingredients) {
+    public static List<Ingredient> parseIngredientList(int recipeId, JSONArray ingredients) {
         List<Ingredient> ingredientsList = new ArrayList<>();
         int i = 0;
         if (ingredients != null) {

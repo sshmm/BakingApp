@@ -1,7 +1,10 @@
 package com.example.android.bakingapp;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -12,9 +15,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.android.bakingapp.adapters.RecipesAdapter;
-import com.example.android.bakingapp.model.Recipe;
+import com.example.android.bakingapp.databaseUtils.DatabaseExecuter;
+import com.example.android.bakingapp.entities.Ingredient;
+import com.example.android.bakingapp.entities.Recipe;
+import com.example.android.bakingapp.entities.Step;
 import com.example.android.bakingapp.utils.JsonUtils;
 import com.example.android.bakingapp.utils.NetworkUtils;
+import com.example.android.bakingapp.viewmodels.RecipesViewModel;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     private RecipesAdapter recipesAdapter;
     private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
-
+    private RecipesViewModel recipesViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
 
         recipesAdapter = new RecipesAdapter(this, MainActivity.this);
 
-
+        recipesViewModel = ViewModelProviders.of(this).get(RecipesViewModel.class);
         if (findViewById(R.id.recycler_view_phone) != null) {
             recyclerView = findViewById(R.id.recycler_view_phone);
             layoutManager
@@ -68,6 +75,14 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
         } else {
             loaderManager.restartLoader(RECIPES_LOADER, queryBundle, this);
         }
+        recipesViewModel.getAllRecipes().observe(this, new Observer<List<Recipe>>() {
+            @Override
+            public void onChanged(@Nullable List<Recipe> recipes) {
+                recipesAdapter.setRecipeData(recipes);
+
+            }
+        });
+
     }
 
     @Override
@@ -114,11 +129,22 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
         List<Recipe> recipesListResults;
+        List<Step> stepsListResults;
+        List<Ingredient> ingredientsListResults;
 
 
         if (data != null && !data.equals("")) {
             recipesListResults = JsonUtils.parseRecipeJson(data);
-            recipesAdapter.setRecipeData(recipesListResults);
+]recipesAdapter.setRecipeData(recipesListResults);
+            for (final Recipe recipe : recipesListResults) {
+                DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        recipesViewModel.addRecipe(recipe);
+                    }
+                });
+            }
+
             recyclerView.setVisibility(View.VISIBLE);
 
         }

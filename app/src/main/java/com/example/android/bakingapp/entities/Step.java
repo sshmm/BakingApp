@@ -1,7 +1,9 @@
-package com.example.android.bakingapp.model;
+package com.example.android.bakingapp.entities;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -9,7 +11,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @Entity(tableName = "steps", foreignKeys = @ForeignKey(entity = Recipe.class,
         parentColumns = "id",
         childColumns = "recipeId",
-        onDelete = CASCADE))
+        onDelete = CASCADE),
+        indices = {@Index("recipeId")})
 public class Step {
     @PrimaryKey(autoGenerate = false)
     private int stepId;
@@ -17,6 +20,7 @@ public class Step {
     private String description;
     private String videoURL;
     private String thumbnailURL;
+    @ColumnInfo(name = "recipeId")
     private int recipeId;
 
     public Step(int stepId, String shortDescription, String description,

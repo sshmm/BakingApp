@@ -17,9 +17,9 @@ import android.widget.Toast;
 
 import com.example.android.bakingapp.adapters.RecipesAdapter;
 import com.example.android.bakingapp.dummy.DummyContent;
-import com.example.android.bakingapp.model.Ingredient;
-import com.example.android.bakingapp.model.Recipe;
-import com.example.android.bakingapp.model.Step;
+import com.example.android.bakingapp.entities.Ingredient;
+import com.example.android.bakingapp.entities.Recipe;
+import com.example.android.bakingapp.entities.Step;
 
 import java.util.List;
 
