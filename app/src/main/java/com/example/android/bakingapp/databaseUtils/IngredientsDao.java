@@ -10,12 +10,14 @@ import com.example.android.bakingapp.entities.Ingredient;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.IGNORE;
+
 @Dao
 public interface IngredientsDao {
-    @Query("SELECT * FROM ingredients WHERE recipeId=:recipeId")
+    @Query("SELECT * FROM ingredients WHERE recipeId=:recipeId ORDER BY ingredientId ASC")
     LiveData<List<Ingredient>> findIngredientsForRecipe(final int recipeId);
 
-    @Insert
+    @Insert(onConflict = IGNORE)
     void addIngredient(Ingredient ingredient);
 
     @Delete

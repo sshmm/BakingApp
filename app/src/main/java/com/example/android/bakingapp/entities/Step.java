@@ -14,7 +14,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         onDelete = CASCADE),
         indices = {@Index("recipeId")})
 public class Step {
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey
     private int stepId;
     private String shortDescription;
     private String description;

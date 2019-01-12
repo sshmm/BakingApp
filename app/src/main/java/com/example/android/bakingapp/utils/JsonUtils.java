@@ -18,7 +18,7 @@ public class JsonUtils {
      * @param JstringArray the JSON Array as String
      * @return List of JSON objects ass Strings
      */
-    private static List<String> getListJson(String JstringArray) {
+    public static List<String> getListJson(String JstringArray) {
         try {
 
             JSONArray JsonArray = new JSONArray(JstringArray);
@@ -37,8 +37,7 @@ public class JsonUtils {
     }
 
 
-    public static List<Recipe> parseRecipeJson(String JstringArray) {
-        List<String> recipes = getListJson(JstringArray);
+    public static List<Recipe> parseRecipeJson(List<String> recipes) {
         List<Recipe> recipeList = new ArrayList<>();
         if (recipes != null) {
             try {
@@ -46,12 +45,6 @@ public class JsonUtils {
                     JSONObject jRecipe = new JSONObject(recipe);
                     int id = jRecipe.getInt("id");
                     String name = jRecipe.getString("name");
-
-                    JSONArray ingredientsArray = jRecipe.getJSONArray("ingredients");
-                    List<Ingredient> ingredients = parseIngredientList(id, ingredientsArray);
-
-                    JSONArray stepsArray = jRecipe.getJSONArray("steps");
-                    List<Step> steps = parseStepList(id, stepsArray);
 
                     int servings = jRecipe.getInt("servings");
                     String imageUrl = jRecipe.getString("image");
@@ -70,7 +63,44 @@ public class JsonUtils {
 
     }
 
-    public static List<Ingredient> parseIngredientList(int recipeId, JSONArray ingredients) {
+    public static List<Ingredient> ingredientsFromJson(String recipe, int recipeId) {
+        if (recipe != null) {
+            try {
+                JSONObject jRecipe = new JSONObject(recipe);
+                JSONArray ingredientsArray = jRecipe.getJSONArray("ingredients");
+                List<Ingredient> ingredients = parseIngredientList(recipeId, ingredientsArray);
+                return ingredients;
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return null;
+        }
+
+    }
+
+    public static List<Step> stepsFromJson(String recipe, int recipeId) {
+        if (recipe != null) {
+            try {
+                JSONObject jRecipe = new JSONObject(recipe);
+                JSONArray ingredientsArray = jRecipe.getJSONArray("steps");
+                List<Step> steps = parseStepList(recipeId, ingredientsArray);
+                return steps;
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return null;
+        }
+
+    }
+
+
+    private static List<Ingredient> parseIngredientList(int recipeId, JSONArray ingredients) {
         List<Ingredient> ingredientsList = new ArrayList<>();
         int i = 0;
         if (ingredients != null) {
@@ -81,7 +111,7 @@ public class JsonUtils {
                     int quantity = jIngredient.getInt("quantity");
                     String measure = jIngredient.getString("measure");
                     String ingredient = jIngredient.getString("ingredient");
-                    ingredientsList.add(new Ingredient(i, quantity, measure, ingredient, recipeId));
+                    ingredientsList.add(new Ingredient((i + 1) * recipeId, quantity, measure, ingredient, recipeId));
                     i++;
                 }
                 return ingredientsList;
@@ -107,7 +137,7 @@ public class JsonUtils {
                     String description = jStep.getString("description");
                     String videoURL = jStep.getString("videoURL");
                     String thumbnailURL = jStep.getString("thumbnailURL");
-                    stepsList.add(new Step(id, shortDescription, description, videoURL, thumbnailURL, recipeId));
+                    stepsList.add(new Step(id * recipeId, shortDescription, description, videoURL, thumbnailURL, recipeId));
                 }
                 return stepsList;
             } catch (JSONException e) {

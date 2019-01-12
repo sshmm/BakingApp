@@ -19,7 +19,6 @@ import butterknife.ButterKnife;
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipesAdapterViewHolder> {
 
-    private static List<Recipe> sRecipeData = new ArrayList<>();
     private final RecipesAdapterOnClickHandler mClickHandler;
     Context context;
     private List<Recipe> mRecipeData = new ArrayList<>();
@@ -29,9 +28,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipesA
         this.context = context;
     }
 
-    public static Recipe getRecipeData(int position) {
-        return sRecipeData.get(position);
-    }
 
     @NonNull
     @Override
@@ -60,7 +56,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipesA
 
     public void setRecipeData(List<Recipe> recipeData) {
         mRecipeData = recipeData;
-        sRecipeData = recipeData;
         notifyDataSetChanged();
     }
 

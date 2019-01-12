@@ -10,13 +10,15 @@ import com.example.android.bakingapp.entities.Step;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.IGNORE;
+
 @Dao
 public interface StepsDao {
 
-    @Query("SELECT * FROM steps WHERE recipeId=:recipeId")
+    @Query("SELECT * FROM steps WHERE recipeId=:recipeId ORDER BY stepId ASC")
     LiveData<List<Step>> findStepsForRecipe(final int recipeId);
 
-    @Insert
+    @Insert(onConflict = IGNORE)
     void addStep(Step step);
 
     @Delete

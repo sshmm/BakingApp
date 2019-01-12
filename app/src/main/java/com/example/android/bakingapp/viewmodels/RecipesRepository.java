@@ -16,20 +16,24 @@ import java.util.List;
 
 public class RecipesRepository {
     private RecipesDao recipesDao;
-    private StepsDao stepsDao;
-    private IngredientsDao ingredientsDao;
     private LiveData<List<Recipe>> mRecipes;
+    private StepsDao stepsDao;
+    private LiveData<List<Step>> mSteps;
+    private IngredientsDao ingredientsDao;
+    private LiveData<List<Ingredient>> mIngredients;
 
     RecipesRepository(Application application) {
         RecipesDatabase db = RecipesDatabase.getInstance(application);
         recipesDao = db.recipesDao();
-        stepsDao = db.stepsDao();
-        ingredientsDao = db.ingredientsDao();
         mRecipes = recipesDao.loadAllrecipes();
+
+        stepsDao = db.stepsDao();
+
+        ingredientsDao = db.ingredientsDao();
     }
 
 
-    LiveData<List<Recipe>> loadAllrecipes() {
+    public LiveData<List<Recipe>> loadAllrecipes() {
         return mRecipes;
     }
 
@@ -43,6 +47,11 @@ public class RecipesRepository {
         });
     }
 
+    public LiveData<List<Step>> loadSteps(int recipeId) {
+        mSteps = stepsDao.findStepsForRecipe(recipeId);
+        return mSteps;
+    }
+
     public void insertStep(final Step step) {
         DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
             @Override
@@ -50,6 +59,11 @@ public class RecipesRepository {
                 stepsDao.addStep(step);
             }
         });
+    }
+
+    public LiveData<List<Ingredient>> loadIngredients(int recipeId) {
+        mIngredients = ingredientsDao.findIngredientsForRecipe(recipeId);
+        return mIngredients;
     }
 
     public void insertIngredient(final Ingredient ingredient) {
@@ -60,5 +74,4 @@ public class RecipesRepository {
             }
         });
     }
-
 }

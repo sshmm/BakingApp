@@ -10,6 +10,8 @@ import com.example.android.bakingapp.entities.Recipe;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.IGNORE;
+
 @Dao
 public interface RecipesDao {
 
@@ -20,7 +22,7 @@ public interface RecipesDao {
     LiveData<Recipe> findRecipeById(int id);
 
 
-    @Insert
+    @Insert(onConflict = IGNORE)
     void addRecipe(Recipe recipe);
 
     @Delete

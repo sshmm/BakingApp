@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
     private RecipesViewModel recipesViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
         recipesAdapter = new RecipesAdapter(this, MainActivity.this);
 
         recipesViewModel = ViewModelProviders.of(this).get(RecipesViewModel.class);
+
         if (findViewById(R.id.recycler_view_phone) != null) {
             recyclerView = findViewById(R.id.recycler_view_phone);
             layoutManager
@@ -128,22 +131,50 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-        List<Recipe> recipesListResults;
+        List<String> recipesJsonList;
+        final List<Recipe> recipesListResults;
         List<Step> stepsListResults;
         List<Ingredient> ingredientsListResults;
 
 
         if (data != null && !data.equals("")) {
-            recipesListResults = JsonUtils.parseRecipeJson(data);
-]recipesAdapter.setRecipeData(recipesListResults);
-            for (final Recipe recipe : recipesListResults) {
+            recipesJsonList = JsonUtils.getListJson(data);
+            recipesListResults = JsonUtils.parseRecipeJson(recipesJsonList);
+            recipesAdapter.setRecipeData(recipesListResults);
+            for (int i = 0; i < recipesListResults.size(); i++) {
+                stepsListResults = JsonUtils.stepsFromJson(recipesJsonList.get(i), i + 1);
+                ingredientsListResults = JsonUtils.ingredientsFromJson(recipesJsonList.get(i), i + 1);
+                Log.e("Recipe", String.valueOf(recipesListResults.get(i).getId()));
+                final int finalI = i;
                 DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
-                        recipesViewModel.addRecipe(recipe);
+                        recipesViewModel.addRecipe(recipesListResults.get(finalI));
                     }
                 });
+
+                for (final Ingredient ingredient : ingredientsListResults) {
+                    Log.e("Ingredient", String.valueOf(ingredient.getIngredientId()));
+                    Log.e("Ingredient", String.valueOf(ingredient.getIngredient()));
+                    DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            recipesViewModel.addIngredient(ingredient);
+                        }
+                    });
+                }
+
+                for (final Step step : stepsListResults) {
+                    DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            recipesViewModel.addStep(step);
+                        }
+                    });
+                }
+
             }
+            recipesAdapter.setRecipeData(recipesListResults);
 
             recyclerView.setVisibility(View.VISIBLE);
 
