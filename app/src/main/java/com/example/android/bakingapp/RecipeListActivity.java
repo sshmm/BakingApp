@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.bakingapp.dummy.DummyContent;
+import com.example.android.bakingapp.entities.IdType;
 import com.example.android.bakingapp.entities.Ingredient;
 import com.example.android.bakingapp.entities.Step;
 import com.example.android.bakingapp.viewmodels.RecipesViewModel;
@@ -86,7 +86,6 @@ public class RecipeListActivity extends AppCompatActivity {
         }
 
         int position = intent.getIntExtra(EXTRA_POSITION, DEFAULT_POSITION);
-        Log.e("Position", String.valueOf(position));
         if (position == DEFAULT_POSITION) {
             //EXTRA_POSITION not found in intent
             closeOnError();
@@ -102,12 +101,7 @@ public class RecipeListActivity extends AppCompatActivity {
         });
 
 
-        recipesViewModel.getIngredients(position + 1).observe(this, new Observer<List<Ingredient>>() {
-            @Override
-            public void onChanged(@Nullable List<Ingredient> ingredients) {
-                mIngredients = ingredients;
-            }
-        });
+        adapter.setmIngredient(position);
         setupRecyclerView((RecyclerView) recyclerView);
 
     }
@@ -121,29 +115,49 @@ public class RecipeListActivity extends AppCompatActivity {
         Toast.makeText(this, "Recipe data is not available.", Toast.LENGTH_LONG).show();
     }
 
-    public static class SimpleItemRecyclerViewAdapter
+    private static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final RecipeListActivity mParentActivity;
         private List<Step> mSteps;
+        private Integer mPosition;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
+                IdType idType = (IdType) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(RecipeDetailFragment.ARG_ITEM_ID, item.id);
+                    arguments.putInt(RecipeDetailFragment.REC_ID, idType.getRecipeId());
+                    arguments.putInt(RecipeDetailFragment.STEP_ID, idType.getStepId());
 
-                    RecipeDetailFragment fragment = new RecipeDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.recipe_detail_container, fragment)
-                            .commit();
+                    if (idType.getType().equals("ingredient")){
+                        RecipeDetailFragment fragment = new RecipeDetailFragment();
+                        fragment.setArguments(arguments);
+                        mParentActivity.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.recipe_detail_container, fragment)
+                                .commit();
+                    } else {
+                        StepsFragment fragment = new StepsFragment();
+                        fragment.setArguments(arguments);
+                        mParentActivity.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.recipe_detail_container, fragment)
+                                .commit();
+                    }
+
                 } else {
                     Context context = view.getContext();
-                    Intent intent = new Intent(context, RecipeDetailActivity.class);
-                    //  intent.putExtra(RecipeDetailFragment.ARG_ITEM_ID, item.id);
+                    Intent intent;
+                    if (idType.getType().equals("ingredient")){
+                        intent = new Intent(context, RecipeDetailActivity.class);
+                        intent.putExtra(RecipeDetailFragment.REC_ID, idType.getRecipeId());
+                        intent.putExtra(RecipeDetailFragment.STEP_ID, idType.getStepId());
+                    } else{
+                        intent = new Intent(context, RecipeStepsActivity.class);
+                        intent.putExtra(StepsFragment.REC_ID, idType.getRecipeId());
+                        intent.putExtra(StepsFragment.STEP_ID, idType.getStepId());
+                    }
+
 
                     context.startActivity(intent);
                 }
@@ -165,18 +179,16 @@ public class RecipeListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            List<Step> recipeSteps = mSteps;
             /*List<Ingredient> ingredientList
                     = mValues.getIngredients();*/
             if (position > 0) {
                 position = position - 1;
-                holder.mContentView.setText(recipeSteps.get(position).getShortDescription());
-
-                holder.itemView.setTag(recipeSteps.get(position));
+                holder.mContentView.setText(mSteps.get(position).getShortDescription());
+                holder.itemView.setTag(new IdType(mPosition + 1,mSteps.get(position).getStepId(),"step"));
             } else {
                 holder.mContentView.setText("Ingredients List");
 
-                holder.itemView.setTag("ingredient");
+                holder.itemView.setTag(new IdType(mPosition+1,mSteps.get(position).getStepId(),"ingredient"));
             }
             holder.itemView.setOnClickListener(mOnClickListener);
         }
@@ -200,6 +212,13 @@ public class RecipeListActivity extends AppCompatActivity {
             mSteps = steps;
             notifyDataSetChanged();
         }
+
+        public void setmIngredient(Integer position) {
+            mPosition = position;
+            notifyDataSetChanged();
+        }
+
+
     }
 
 }

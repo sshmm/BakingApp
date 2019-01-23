@@ -19,6 +19,7 @@ public class RecipesRepository {
     private LiveData<List<Recipe>> mRecipes;
     private StepsDao stepsDao;
     private LiveData<List<Step>> mSteps;
+    private LiveData<Step> mStep;
     private IngredientsDao ingredientsDao;
     private LiveData<List<Ingredient>> mIngredients;
 
@@ -50,6 +51,11 @@ public class RecipesRepository {
     public LiveData<List<Step>> loadSteps(int recipeId) {
         mSteps = stepsDao.findStepsForRecipe(recipeId);
         return mSteps;
+    }
+
+    public LiveData<Step> loadStep(int stepId){
+        mStep = stepsDao.findStep(stepId);
+        return mStep;
     }
 
     public void insertStep(final Step step) {

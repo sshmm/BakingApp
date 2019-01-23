@@ -1,27 +1,39 @@
 package com.example.android.bakingapp;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-/**
- * An activity representing a single Recipe detail screen. This
- * activity is only used on narrow width devices. On tablet-size devices,
- * item details are presented side-by-side with a list of items
- * in a {@link RecipeListActivity}.
- */
-public class RecipeDetailActivity extends AppCompatActivity {
+import com.example.android.bakingapp.entities.Step;
+import com.example.android.bakingapp.viewmodels.RecipesViewModel;
 
+public class RecipeStepsActivity extends AppCompatActivity {
+    private RecipesViewModel recipesViewModel;
+    private Step mStep;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_detail);
+
+/*        recipesViewModel = ViewModelProviders.of(this).get(RecipesViewModel.class);
+        recipesViewModel.getStep(getIntent().getIntExtra(StepsFragment.STEP_ID,0)).observe(this, new Observer<Step>() {
+            @Override
+            public void onChanged(@Nullable Step step) {
+                mStep = step;
+                Log.e("ddddddddddd", step.getVideoURL());
+            }
+        });
+*/
+        setContentView(R.layout.activity_recipe_steps);
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
@@ -50,14 +62,13 @@ public class RecipeDetailActivity extends AppCompatActivity {
         // http://developer.android.com/guide/components/fragments.html
         //
         if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putInt(RecipeDetailFragment.STEP_ID,
-                    getIntent().getIntExtra(RecipeDetailFragment.STEP_ID,0));
-            arguments.putInt(RecipeDetailFragment.REC_ID,
-                    getIntent().getIntExtra(RecipeDetailFragment.REC_ID,1));
-            RecipeDetailFragment fragment = new RecipeDetailFragment();
+            arguments.putInt(StepsFragment.STEP_ID,
+                    getIntent().getIntExtra(StepsFragment.STEP_ID,0));
+            arguments.putInt(StepsFragment.REC_ID,
+                    getIntent().getIntExtra(StepsFragment.REC_ID,1));
+            StepsFragment fragment = new StepsFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.recipe_detail_container, fragment)
@@ -81,3 +92,5 @@ public class RecipeDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+
+

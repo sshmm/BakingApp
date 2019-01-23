@@ -17,6 +17,7 @@ public class RecipesViewModel extends AndroidViewModel {
     private LiveData<List<Recipe>> mAllRecipes;
     private LiveData<List<Ingredient>> mIngredients;
     private LiveData<List<Step>> mSteps;
+    private LiveData<Step> mStep;
 
     public RecipesViewModel(Application application) {
         super(application);
@@ -39,6 +40,11 @@ public class RecipesViewModel extends AndroidViewModel {
 
     public void addStep(Step step) {
         mRepository.insertStep(step);
+    }
+
+    public LiveData<Step> getStep(int stepId) {
+        mStep = mRepository.loadStep(stepId);
+        return mStep;
     }
 
     public LiveData<List<Ingredient>> getIngredients(int recipeId) {

@@ -111,7 +111,7 @@ public class JsonUtils {
                     int quantity = jIngredient.getInt("quantity");
                     String measure = jIngredient.getString("measure");
                     String ingredient = jIngredient.getString("ingredient");
-                    ingredientsList.add(new Ingredient((i + 1) * recipeId, quantity, measure, ingredient, recipeId));
+                    ingredientsList.add(new Ingredient((i + (100 * recipeId)), quantity, measure, ingredient, recipeId));
                     i++;
                 }
                 return ingredientsList;
@@ -137,7 +137,7 @@ public class JsonUtils {
                     String description = jStep.getString("description");
                     String videoURL = jStep.getString("videoURL");
                     String thumbnailURL = jStep.getString("thumbnailURL");
-                    stepsList.add(new Step(id * recipeId, shortDescription, description, videoURL, thumbnailURL, recipeId));
+                    stepsList.add(new Step(id +(100* recipeId), shortDescription, description, videoURL, thumbnailURL, recipeId));
                 }
                 return stepsList;
             } catch (JSONException e) {

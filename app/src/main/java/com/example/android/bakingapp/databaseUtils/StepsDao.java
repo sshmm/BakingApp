@@ -18,6 +18,9 @@ public interface StepsDao {
     @Query("SELECT * FROM steps WHERE recipeId=:recipeId ORDER BY stepId ASC")
     LiveData<List<Step>> findStepsForRecipe(final int recipeId);
 
+    @Query("SELECT * FROM steps WHERE stepId=:stepId")
+    LiveData<Step> findStep(final int stepId);
+
     @Insert(onConflict = IGNORE)
     void addStep(Step step);
 
