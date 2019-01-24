@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.bakingapp.dummy.DummyContent;
 import com.example.android.bakingapp.entities.Ingredient;
 import com.example.android.bakingapp.entities.Step;
 import com.example.android.bakingapp.viewmodels.RecipesViewModel;
@@ -119,10 +118,8 @@ public class RecipeDetailFragment extends Fragment {
         adapter = new SimpleItemRecyclerViewAdapter();
 
         setupRecyclerView((RecyclerView) recyclerView);
-        // Show the dummy content as text in a TextView.
-        if (""/*mItem*/ != null) {
-            ((TextView) rootView.findViewById(R.id.recipe_detail)).setText(/*mItem.details*/"details");
-        }
+        ((TextView) rootView.findViewById(R.id.recipe_detail)).setText(R.string.ingredients_list);
+
 
         return rootView;
     }
@@ -146,8 +143,10 @@ public class RecipeDetailFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-                holder.mContentView.setText(mIngredient.get(position).getIngredient());
-                Log.e("Ingredient Id: ",String.valueOf(mIngredient.get(position).getIngredientId()));
+                String ingredient = mIngredient.get(position).getQuantity() + " " +
+                        mIngredient.get(position).getMeasure() + " Of " +
+                        mIngredient.get(position).getIngredient();
+                holder.mContentView.setText(ingredient);
                 }
 
         @Override

@@ -137,6 +137,15 @@ public class JsonUtils {
                     String description = jStep.getString("description");
                     String videoURL = jStep.getString("videoURL");
                     String thumbnailURL = jStep.getString("thumbnailURL");
+                    if (videoURL.equals("")){
+                        String ext = getExt(thumbnailURL);
+                        if(ext != null && ext.equals("mp4")){
+                            videoURL = thumbnailURL;
+                            thumbnailURL = "";
+                        }
+                    }
+
+
                     stepsList.add(new Step(id +(100* recipeId), shortDescription, description, videoURL, thumbnailURL, recipeId));
                 }
                 return stepsList;
@@ -147,6 +156,13 @@ public class JsonUtils {
         } else {
             return null;
         }
+    }
+
+    private static String getExt(String filePath){
+        int strLength = filePath.lastIndexOf(".");
+        if(strLength > 0)
+            return filePath.substring(strLength + 1).toLowerCase();
+        return null;
     }
 
 }

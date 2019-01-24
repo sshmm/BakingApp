@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -41,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
     private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
     private RecipesViewModel recipesViewModel;
+
+    private Parcelable savedRecyclerLayoutState;
+    private static final String BUNDLE_RECYCLER_LAYOUT = "recycler_layout";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,8 +159,6 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
                 });
 
                 for (final Ingredient ingredient : ingredientsListResults) {
-                    Log.e("Ingredient", String.valueOf(ingredient.getIngredientId()));
-                    Log.e("Ingredient", String.valueOf(ingredient.getIngredient()));
                     DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -177,12 +180,29 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
             recipesAdapter.setRecipeData(recipesListResults);
 
             recyclerView.setVisibility(View.VISIBLE);
-
+            layoutManager.onRestoreInstanceState(savedRecyclerLayoutState);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT,
+                layoutManager.onSaveInstanceState());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        //restore recycler view at same position
+        if (savedInstanceState != null) {
+            savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+        }
     }
 }

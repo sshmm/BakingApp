@@ -32,10 +32,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RecipeStepsActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity
+            android:name=".RecipeStepsActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        </activity>
+        <receiver android:name=".RecipeWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/recipe_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

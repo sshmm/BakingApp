@@ -75,7 +75,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            navigateUpTo(new Intent(this, RecipeListActivity.class));
+            Intent intent= new Intent(this, RecipeListActivity.class);
+            intent.putExtra(RecipeListActivity.EXTRA_POSITION,getIntent().getIntExtra(RecipeDetailFragment.REC_ID,0) -1 );
+            navigateUpTo(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

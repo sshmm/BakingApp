@@ -2,6 +2,7 @@ package com.example.android.bakingapp;
 
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.android.bakingapp.entities.Ingredient;
 import com.example.android.bakingapp.entities.Step;
@@ -84,6 +87,8 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
             }
         }
 
+
+
     }
 
     @Override
@@ -94,20 +99,30 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
 
         // Initialize the player view.
         mPlayerView =  rootView.findViewById(R.id.playerView);
-
-        // Initialize the Media Session.
-        initializeMediaSession();
-
-        recipesViewModel = ViewModelProviders.of(getActivity()).get(RecipesViewModel.class);
+        final TextView shortDescView = rootView.findViewById(R.id.tv_short_description);
+        final TextView descTitleView = rootView.findViewById(R.id.tv_description_title);
+        final TextView descView = rootView.findViewById(R.id.tv_description);
+        descTitleView.setText(R.string.step_dec_title);
+        recipesViewModel = ViewModelProviders.of(this).get(RecipesViewModel.class);
         recipesViewModel.getStep(getArguments().getInt(STEP_ID)).observe(this, new Observer<Step>() {
             @Override
             public void onChanged(@Nullable Step step) {
                 // Initialize the player.
                 Log.e("Video Url", step.getVideoURL());
-                initializePlayer(Uri.parse(step.getVideoURL()));
+                shortDescView.setText(step.getShortDescription());
+                descView.setText(step.getDescription());
+                // Initialize the Media Session.
+                if (step.getVideoURL() == null || step.getVideoURL().equals("") ){
+                    mPlayerView.setVisibility(View.GONE);
+                    initializePlayer(Uri.parse(""));
+                }else {
+                    mPlayerView.setVisibility(View.VISIBLE);
+                    initializePlayer(Uri.parse(step.getVideoURL()));
+                }
             }
         });
 
+        initializeMediaSession();
 
 
         return rootView;
@@ -237,7 +252,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-        mNotificationManager.cancelAll();
         mExoPlayer.stop();
         mExoPlayer.release();
         mExoPlayer = null;
@@ -287,7 +301,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
                     mExoPlayer.getCurrentPosition(), 1f);
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
-        // showNotification(mStateBuilder.build());
     }
 
     @Override
@@ -312,5 +325,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
             MediaButtonReceiver.handleIntent(mMediaSession, intent);
         }
     }
+
+
 
 }
