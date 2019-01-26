@@ -1,15 +1,26 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#09C"
+    android:orientation="vertical"
     android:padding="@dimen/widget_margin">
+    <!-- ListView to be shown on widget -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/recipes_list"
+        android:textSize="30sp"
+        android:layout_margin="10dp"/>
+    <ListView
+        android:id="@+id/listViewWidget"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/appwidget_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:visibility="gone"
         android:layout_margin="8dp"
         android:background="#09C"
         android:contentDescription="@string/appwidget_text"
@@ -18,4 +29,4 @@
         android:textSize="24sp"
         android:textStyle="bold|italic" />
 
-</RelativeLayout>
+</LinearLayout>

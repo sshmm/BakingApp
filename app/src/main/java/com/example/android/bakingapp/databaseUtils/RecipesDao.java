@@ -18,6 +18,9 @@ public interface RecipesDao {
     @Query("SELECT * FROM recipes ORDER BY id")
     LiveData<List<Recipe>> loadAllrecipes();
 
+    @Query("SELECT * FROM recipes ORDER BY id")
+    List<Recipe> loadAllrecipes2();
+
     @Query("SELECT * FROM recipes WHERE id = :id LIMIT 1")
     LiveData<Recipe> findRecipeById(int id);
 
