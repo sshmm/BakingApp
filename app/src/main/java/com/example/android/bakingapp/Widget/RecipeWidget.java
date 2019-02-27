@@ -1,4 +1,4 @@
-package com.example.android.bakingapp;
+package com.example.android.bakingapp.Widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -7,8 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.example.android.bakingapp.R;
+import com.example.android.bakingapp.RecipeDetailActivity;
 
 /**
  * Implementation of App Widget functionality.
@@ -20,16 +22,16 @@ public class RecipeWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
                          int[] appWidgetIds) {
         for (int i=0; i<appWidgetIds.length; i++) {
-            Intent svcIntent=new Intent(context, WidgetService.class);
+            Intent intent=new Intent(context, WidgetService.class);
 
-            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 
             RemoteViews widget=new RemoteViews(context.getPackageName(),
                     R.layout.recipe_widget);
 
             widget.setRemoteAdapter( R.id.listViewWidget,
-                    svcIntent);
+                    intent);
 
             Intent clickIntent=new Intent(context, RecipeDetailActivity.class);
             PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)

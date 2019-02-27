@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewDebug;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -66,8 +68,10 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
     private Step mStep;
+    private long position = 0;
+    private boolean isDestroyed = false;
     //private OnFragmentInteractionListener mListener;
-
+    private Bundle saveState = new Bundle();
     public StepsFragment() {
         // Required empty public constructor
     }
@@ -87,13 +91,14 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
             }
         }
 
+        initializeMediaSession();
 
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView =  inflater.inflate(R.layout.fragment_steps, container, false);
 
@@ -108,7 +113,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
             @Override
             public void onChanged(@Nullable Step step) {
                 // Initialize the player.
-                Log.e("Video Url", step.getVideoURL());
                 shortDescView.setText(step.getShortDescription());
                 descView.setText(step.getDescription());
                 // Initialize the Media Session.
@@ -117,34 +121,34 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
                     initializePlayer(Uri.parse(""));
                 }else {
                     mPlayerView.setVisibility(View.VISIBLE);
+                    saveState.putString("url",step.getVideoURL());
                     initializePlayer(Uri.parse(step.getVideoURL()));
+                    if (savedInstanceState != null){
+                        saveState = savedInstanceState.getBundle("savedbundle");
+                        if (saveState.containsKey("position")) {
+
+                            position = saveState.getLong("position");
+                            mExoPlayer.seekTo(saveState.getLong("position"));
+                        }
+                        if (saveState.containsKey("destroyed")){
+                            isDestroyed = saveState.getBoolean("destroyed");
+                        }
+                    }
+
                 }
             }
         });
 
-        initializeMediaSession();
 
 
         return rootView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-       /* if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }*/
     }
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-     /*   if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+
     }
 
     @Override
@@ -164,7 +168,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
      * >Communicating with Other Fragments</a> for more information.
      */
     /*public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }*/
     /**
@@ -239,7 +242,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
             mExoPlayer.addListener(this);
 
             // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(getActivity(), "ClassicalMusicQuiz");
+            String userAgent = Util.getUserAgent(getActivity(), "BakingApp");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
@@ -260,8 +263,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        releasePlayer();
-        mMediaSession.setActive(false);
     }
 
     /**
@@ -326,6 +327,59 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener{
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null) {
 
+            position = mExoPlayer.getCurrentPosition();
+            saveState.putLong("position", position);
+            releasePlayer();
 
+        }
+       mMediaSession.setActive(false);
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        saveState.putBoolean("destroyed",true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!isDestroyed) {
+
+            recipesViewModel = ViewModelProviders.of(this).get(RecipesViewModel.class);
+            recipesViewModel.getStep(getArguments().getInt(STEP_ID)).observe(this, new Observer<Step>() {
+                @Override
+                public void onChanged(@Nullable Step step) {
+                    // Initialize the player.
+                    // Initialize the Media Session.
+                    if (step.getVideoURL() == null || step.getVideoURL().equals("")) {
+                        mPlayerView.setVisibility(View.GONE);
+                        initializePlayer(Uri.parse(""));
+                    } else {
+                        mPlayerView.setVisibility(View.VISIBLE);
+                        initializePlayer(Uri.parse(step.getVideoURL()));
+                        mExoPlayer.seekTo(position);
+
+                    }
+                }
+            });
+        }
+
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+        if (saveState != null)
+            outState.putBundle("savedbundle",saveState);
+
+    }
 }

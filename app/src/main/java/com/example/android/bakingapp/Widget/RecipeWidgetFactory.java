@@ -1,4 +1,4 @@
-package com.example.android.bakingapp;
+package com.example.android.bakingapp.Widget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
+import com.example.android.bakingapp.R;
+import com.example.android.bakingapp.RecipeDetailFragment;
 import com.example.android.bakingapp.databaseUtils.DatabaseExecuter;
 import com.example.android.bakingapp.databaseUtils.RecipesDatabase;
 import com.example.android.bakingapp.entities.Recipe;
@@ -21,13 +23,13 @@ import com.example.android.bakingapp.entities.Recipe;
  * with few changes
  *
  */
-public class ListProvider implements RemoteViewsFactory {
+public class RecipeWidgetFactory implements RemoteViewsFactory {
     private ArrayList<Recipe> listItemList = new ArrayList<Recipe>();
     private Context context;
     private List<Recipe> data;
     private int appWidgetId;
 
-    public ListProvider(Context context, Intent intent) {
+    public RecipeWidgetFactory(Context context, Intent intent) {
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);

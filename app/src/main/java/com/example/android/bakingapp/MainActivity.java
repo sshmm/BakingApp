@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements RecipesAdapter.Re
             for (int i = 0; i < recipesListResults.size(); i++) {
                 stepsListResults = JsonUtils.stepsFromJson(recipesJsonList.get(i), i + 1);
                 ingredientsListResults = JsonUtils.ingredientsFromJson(recipesJsonList.get(i), i + 1);
-                Log.e("Recipe", String.valueOf(recipesListResults.get(i).getId()));
                 final int finalI = i;
                 DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
                     @Override
