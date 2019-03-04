@@ -16,6 +16,7 @@ import com.example.android.bakingapp.R;
 import com.example.android.bakingapp.RecipeDetailFragment;
 import com.example.android.bakingapp.databaseUtils.DatabaseExecuter;
 import com.example.android.bakingapp.databaseUtils.RecipesDatabase;
+import com.example.android.bakingapp.entities.Ingredient;
 import com.example.android.bakingapp.entities.Recipe;
 
 /**
@@ -24,35 +25,27 @@ import com.example.android.bakingapp.entities.Recipe;
  *
  */
 public class RecipeWidgetFactory implements RemoteViewsFactory {
-    private ArrayList<Recipe> listItemList = new ArrayList<Recipe>();
     private Context context;
-    private List<Recipe> data;
+    private List<Ingredient> data;
     private int appWidgetId;
+    private int recipeId;
 
     public RecipeWidgetFactory(Context context, Intent intent) {
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
+        recipeId = intent.getIntExtra("recipe",1);
 
 
     }
-/*
-    private void populateListItem() {
-        for (int i = 0; i < 10; i++) {
-            Recipe recipe = new Recipe(i,String.valueOf(i)+"kkkkkkkkkkkkkkk",i,String.valueOf(i));
-            listItemList.add(recipe);
-        }
 
-    }*/
 
     @Override
     public int getCount() {
         if (data == null){
-            Log.e("Test3", String.valueOf(0));
 
             return 0;
         }else {
-        Log.e("Test3", String.valueOf(data.size()));
         return data.size();}
     }
 
@@ -71,16 +64,15 @@ public class RecipeWidgetFactory implements RemoteViewsFactory {
 
         final RemoteViews remoteView = new RemoteViews(
                 context.getPackageName(), R.layout.widget_list_row);
-       if (data == null)
-           Log.e("Test2", "Empty");
-       else{
-           Log.e("Test2", data.get(2).getName());
-           Log.e("Test2", String.valueOf(position));
-           remoteView.setTextViewText(R.id.content,data.get(position).getName());
+       if (data == null){
 
-           Intent fillInIntent = new Intent();
-           fillInIntent.putExtra(RecipeDetailFragment.REC_ID,data.get(position).getId());
-           remoteView.setOnClickFillInIntent(R.id.content, fillInIntent);
+       }
+       else{
+           String ingredient = data.get(position).getQuantity() + " " +
+                   data.get(position).getMeasure() + " Of " +
+                   data.get(position).getIngredient();
+
+           remoteView.setTextViewText(R.id.content,ingredient);
 
        }
 
@@ -110,7 +102,7 @@ public class RecipeWidgetFactory implements RemoteViewsFactory {
         DatabaseExecuter.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                data = RecipesDatabase.getInstance(context).recipesDao().loadAllrecipes2();
+                data = RecipesDatabase.getInstance(context).ingredientsDao().findIngredientsForRecipe2(recipeId + 1);
             }
         });
     }

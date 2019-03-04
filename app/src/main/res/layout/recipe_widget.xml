@@ -5,12 +5,7 @@
     android:orientation="vertical"
     android:padding="@dimen/widget_margin">
     <!-- ListView to be shown on widget -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/recipes_list"
-        android:textSize="30sp"
-        android:layout_margin="10dp"/>
+
     <ListView
         android:id="@+id/listViewWidget"
         android:layout_width="match_parent"

@@ -17,6 +17,9 @@ public interface IngredientsDao {
     @Query("SELECT * FROM ingredients WHERE recipeId=:recipeId ORDER BY ingredientId ASC")
     LiveData<List<Ingredient>> findIngredientsForRecipe(final int recipeId);
 
+    @Query("SELECT * FROM ingredients WHERE recipeId=:recipeId ORDER BY ingredientId ASC")
+    List<Ingredient> findIngredientsForRecipe2(final int recipeId);
+
     @Insert(onConflict = IGNORE)
     void addIngredient(Ingredient ingredient);
 

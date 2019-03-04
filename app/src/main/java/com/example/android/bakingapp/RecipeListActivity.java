@@ -1,10 +1,13 @@
 package com.example.android.bakingapp;
 
+import android.appwidget.AppWidgetManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -24,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.bakingapp.Widget.RecipeWidget;
 import com.example.android.bakingapp.entities.IdType;
 import com.example.android.bakingapp.entities.Ingredient;
 import com.example.android.bakingapp.entities.Step;
@@ -105,6 +109,18 @@ public class RecipeListActivity extends AppCompatActivity {
 
         adapter.setmIngredient(position);
         setupRecyclerView((RecyclerView) recyclerView);
+
+        Intent intentBroad = new Intent(this, RecipeWidget.class);
+        intentBroad.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+// Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
+// since it seems the onUpdate() is only fired on that:
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(this);
+        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(this, RecipeWidget.class));
+         widgetManager.notifyAppWidgetViewDataChanged(ids, android.R.id.list);
+
+        intentBroad.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        intentBroad.putExtra("recipe",position);
+        sendBroadcast(intentBroad);
 
     }
 
